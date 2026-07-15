@@ -50,6 +50,9 @@ class RestoreApiPrefix:
         await self.application(scope, receive, send)
 
 
+# Keep an explicit FastAPI construction in the entry file so EdgeOne detects
+# framework mode, then expose the original application through the path adapter
+# directly. Using FastAPI.mount("/") here changes ASGI root_path on EdgeOne and
+# makes otherwise valid routes resolve as 404.
 app = FastAPI(title="貔貅学长 EdgeOne API")
-app.add_middleware(RestoreApiPrefix)
-app.mount("/", _pixiu_app)
+app = RestoreApiPrefix(_pixiu_app)
