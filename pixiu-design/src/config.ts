@@ -9,7 +9,7 @@ const runtimeApiBase = globalThis.__PIXIU_API_BASE__?.trim()
 
 export const API_BASE = runtimeApiBase || (isLocalDevelopment
   ? 'http://localhost:8000'
-  : 'https://web-production-f10bf.up.railway.app')
+  : 'https://pixiu-cmb-finals.edgeone.dev')
 
 // 获取或生成用户唯一标识（持久化到 localStorage，每个浏览器唯一）
 export function getUserId(): string {
