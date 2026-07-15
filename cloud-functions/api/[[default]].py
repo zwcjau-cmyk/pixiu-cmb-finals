@@ -24,14 +24,13 @@ from fastapi import FastAPI
 _BUNDLED_BACKEND = Path(__file__).resolve().parents[1] / "backend"
 _RUNTIME_BACKEND = Path("/tmp/pixiu-agent-web")
 
-if not _RUNTIME_BACKEND.exists():
-    shutil.copytree(_BUNDLED_BACKEND, _RUNTIME_BACKEND)
+shutil.copytree(_BUNDLED_BACKEND, _RUNTIME_BACKEND, dirs_exist_ok=True)
 
 runtime_path = str(_RUNTIME_BACKEND)
 if runtime_path not in sys.path:
     sys.path.insert(0, runtime_path)
 
-from main import app as _pixiu_app  # noqa: E402
+from pixiu_app import app as _pixiu_app  # noqa: E402
 
 
 class RestoreApiPrefix:
@@ -43,10 +42,11 @@ class RestoreApiPrefix:
             scope = dict(scope)
             path = scope.get("path", "/")
             raw_path = scope.get("raw_path", path.encode("utf-8"))
-            scope["path"] = f"/api{path if path.startswith('/') else '/' + path}"
-            scope["raw_path"] = b"/api" + (
-                raw_path if raw_path.startswith(b"/") else b"/" + raw_path
-            )
+            if not path.startswith("/api/") and path != "/api":
+                scope["path"] = f"/api{path if path.startswith('/') else '/' + path}"
+                scope["raw_path"] = b"/api" + (
+                    raw_path if raw_path.startswith(b"/") else b"/" + raw_path
+                )
         await self.application(scope, receive, send)
 
 
