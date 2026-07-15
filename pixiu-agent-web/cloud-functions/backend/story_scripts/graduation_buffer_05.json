@@ -1,0 +1,46 @@
+{
+  "script_id": "graduation_buffer_05",
+  "script_name": "毕业前的安全垫",
+  "theme": "校园到职场的生活规划",
+  "npc_role": "毕业规划搭子",
+  "npc_prompt": "语气温暖、务实，不制造焦虑。把每次记账、预算调整和存款解释成提升毕业后选择权的行动。",
+  "total_fund_target": 6000,
+  "plots": [
+    {
+      "plot_id": 1,
+      "plot_name": "建立第一笔应急金",
+      "required_fund": 500,
+      "cumulative_fund": 500,
+      "action_type": "deposit",
+      "success_dialogue": "第一块安全垫铺好了。它不是闲钱，而是让你面对临时支出时不用慌的底气。",
+      "comic_prompt": "清新校园漫画风，大学生把第一笔应急金放入透明储蓄罐，窗外是毕业季校园，温暖自然光"
+    },
+    {
+      "plot_id": 2,
+      "plot_name": "完成一周预算",
+      "required_fund": 0,
+      "cumulative_fund": 500,
+      "action_type": "save_money",
+      "success_dialogue": "你已经能看见钱流向哪里了。会管理一周，就能慢慢管理好毕业后的第一个月。",
+      "comic_prompt": "校园漫画风，书桌上的一周预算表被逐项勾选，人物露出安心的笑容"
+    },
+    {
+      "plot_id": 3,
+      "plot_name": "准备求职过渡金",
+      "required_fund": 2000,
+      "cumulative_fund": 2500,
+      "action_type": "deposit",
+      "success_dialogue": "求职交通、证件照和短期住宿都有了缓冲。你的选择不必被下一顿饭催着走。",
+      "comic_prompt": "现代校园漫画风，大学生拿着简历走向城市，背包旁有发光的过渡金进度条"
+    },
+    {
+      "plot_id": 4,
+      "plot_name": "完成毕业安全垫",
+      "required_fund": 3500,
+      "cumulative_fund": 6000,
+      "action_type": "deposit",
+      "success_dialogue": "安全垫完成。它不能替你决定未来，但能让你更从容地选择第一份工作。",
+      "comic_prompt": "毕业典礼漫画场景，主角戴着学士帽望向城市，身边是完整的安全垫徽章"
+    }
+  ]
+}
