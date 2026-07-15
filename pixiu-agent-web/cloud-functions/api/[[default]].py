@@ -20,17 +20,28 @@ from pathlib import Path
 
 from fastapi import FastAPI
 
+_API_DIR = Path(__file__).resolve().parent
+if str(_API_DIR) not in sys.path:
+    sys.path.insert(0, str(_API_DIR))
+
+from embedded_resources import SCRIPT_JSON_FILES, SOUL_MARKDOWN
+
 
 _BUNDLED_BACKEND = Path(__file__).resolve().parents[1] / "backend"
-_RUNTIME_BACKEND = Path("/tmp/pixiu-agent-web")
+_RUNTIME_BACKEND = Path("/tmp/pixiu-agent-web-v2")
 
 shutil.copytree(_BUNDLED_BACKEND, _RUNTIME_BACKEND, dirs_exist_ok=True)
+(_RUNTIME_BACKEND / "soul.md").write_text(SOUL_MARKDOWN, encoding="utf-8")
+story_scripts = _RUNTIME_BACKEND / "story_scripts"
+story_scripts.mkdir(parents=True, exist_ok=True)
+for filename, contents in SCRIPT_JSON_FILES.items():
+    (story_scripts / filename).write_text(contents, encoding="utf-8")
 
 runtime_path = str(_RUNTIME_BACKEND)
 if runtime_path not in sys.path:
     sys.path.insert(0, runtime_path)
 
-from pixiu_app import app as _pixiu_app  # noqa: E402
+from pixiu_app import backend_app as _pixiu_app  # noqa: E402
 
 
 app = FastAPI(title="貔貅学长 EdgeOne API")
