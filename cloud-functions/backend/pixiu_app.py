@@ -91,7 +91,7 @@ app.add_middleware(
 # 挂载贴纸静态文件目录
 STICKER_DIR = Path(__file__).parent / "stickers"
 STICKER_DIR.mkdir(parents=True, exist_ok=True)
-app.mount("/api/stickers", StaticFiles(directory=str(STICKER_DIR)), name="stickers")
+app.mount("/stickers", StaticFiles(directory=str(STICKER_DIR)), name="stickers")
 
 
 class ChatRequest(BaseModel):
@@ -105,7 +105,7 @@ class ChatResponse(BaseModel):
     session_id: str
 
 
-@app.post("/api/chat")
+@app.post("/chat")
 async def chat_endpoint(req: ChatRequest):
     """与貔貅学长对话 - SSE 流式输出"""
     # 每次请求动态更新日期，确保跨天后日期正确（东八区）
@@ -141,7 +141,7 @@ async def chat_endpoint(req: ChatRequest):
     )
 
 
-@app.get("/api/health")
+@app.get("/health")
 async def health():
     return {"status": "ok", "agent": "貔貅学长"}
 
@@ -169,7 +169,7 @@ class StickerResponse(BaseModel):
     message: str = ""
 
 
-@app.post("/api/sticker/create", response_model=StickerResponse)
+@app.post("/sticker/create", response_model=StickerResponse)
 async def create_sticker(req: StickerRequest):
     """一键流程：识别商品 → 抠图制作贴纸 → 添加到藏宝阁"""
     import json as _json
@@ -229,7 +229,7 @@ async def create_sticker(req: StickerRequest):
     )
 
 
-@app.get("/api/sticker/shelf")
+@app.get("/sticker/shelf")
 async def get_shelf(user_id: str = "default_user"):
     """获取藏宝阁储物架数据"""
     import json as _json
@@ -296,7 +296,7 @@ class VaultUpdate(BaseModel):
     user_id: str = "default_user"  # 用户标识
 
 
-@app.post("/api/expense/record")
+@app.post("/expense/record")
 async def record_expense(req: ExpenseRecord):
     """记录一笔收支（按 user_id 隔离存储）"""
     import json as _json
@@ -333,7 +333,7 @@ async def record_expense(req: ExpenseRecord):
     }
 
 
-@app.post("/api/expense/import")
+@app.post("/expense/import")
 async def import_expenses(req: ExpenseImportRequest):
     """导入用户确认过的 CSV 账单记录，并按关键字段去重。"""
     if not req.records or len(req.records) > 1000:
@@ -391,7 +391,7 @@ def _expense_records_for_user(user_id: Optional[str]) -> tuple[list[dict], bool]
     return _DEFAULT_EXPENSES.get("records", []), True
 
 
-@app.get("/api/expense/summary")
+@app.get("/expense/summary")
 async def get_expense_summary(user_id: Optional[str] = None):
     """获取收支汇总；真实数据与体验数据不会混合。"""
     all_records, is_demo = _expense_records_for_user(user_id)
@@ -405,7 +405,7 @@ async def get_expense_summary(user_id: Optional[str] = None):
     }
 
 
-@app.get("/api/expense/day/{date}")
+@app.get("/expense/day/{date}")
 async def get_expense_by_day(date: str, user_id: Optional[str] = None):
     """获取某一天的收支明细，date格式：2026-05-16"""
     all_records, is_demo = _expense_records_for_user(user_id)
@@ -438,7 +438,7 @@ async def get_expense_by_day(date: str, user_id: Optional[str] = None):
     }
 
 
-@app.post("/api/vault/update")
+@app.post("/vault/update")
 async def update_vault(req: VaultUpdate):
     """更新金库资产或梦想清单进度（按 user_id 隔离）"""
     data = _load_user_vault(req.user_id)
@@ -498,7 +498,7 @@ async def update_vault(req: VaultUpdate):
     }
 
 
-@app.get("/api/vault/status")
+@app.get("/vault/status")
 async def get_vault_status(user_id: Optional[str] = None):
     """获取金库完整状态（按 user_id 隔离）"""
     if user_id:
@@ -521,7 +521,7 @@ async def get_vault_status(user_id: Optional[str] = None):
     return result
 
 
-@app.get("/api/vault/account/{account_id}")
+@app.get("/vault/account/{account_id}")
 async def get_account_detail(account_id: str, user_id: Optional[str] = None):
     """获取某个账户的详细信息（按 user_id 隔离）"""
     if user_id:
@@ -565,7 +565,7 @@ class WithdrawRequest(BaseModel):
     user_id: str = "default_user"
 
 
-@app.post("/api/vault/withdraw")
+@app.post("/vault/withdraw")
 async def request_withdraw(req: WithdrawRequest):
     """提交形式化转出申请；余额校验通过后申请默认获批。"""
     data = _load_user_vault(req.user_id)
@@ -592,7 +592,7 @@ async def request_withdraw(req: WithdrawRequest):
     }
 
 
-@app.delete("/api/user/finance-data")
+@app.delete("/user/finance-data")
 async def delete_user_finance_data(user_id: str):
     """删除当前浏览器标识关联的账单、金库和宝物架数据。"""
     safe_id = user_id.replace("/", "_").replace("..", "_")
@@ -633,7 +633,7 @@ class ScriptChatResponse(BaseModel):
     image_url: Optional[str] = None
 
 
-@app.post("/api/script/chat")
+@app.post("/script/chat")
 async def script_chat_endpoint(req: ScriptChatRequest):
     """统一对话入口 - SSE 流式输出"""
     import re
@@ -749,7 +749,7 @@ async def script_chat_endpoint(req: ScriptChatRequest):
     )
 
 
-@app.get("/api/script/progress/{user_id}")
+@app.get("/script/progress/{user_id}")
 async def script_progress_endpoint(user_id: str = "default_user"):
     """获取用户的剧情进度（供前端 UI 展示用）"""
     from memory.script_state import ScriptState
@@ -757,7 +757,7 @@ async def script_progress_endpoint(user_id: str = "default_user"):
     return state.get_progress_summary()
 
 
-@app.get("/api/script/available")
+@app.get("/script/available")
 async def available_scripts():
     """获取可用剧本列表（供前端 UI 展示用）"""
     import json
