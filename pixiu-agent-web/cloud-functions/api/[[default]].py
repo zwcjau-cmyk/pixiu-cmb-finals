@@ -19,6 +19,7 @@ import sys
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 _API_DIR = Path(__file__).resolve().parent
 if str(_API_DIR) not in sys.path:
@@ -46,3 +47,14 @@ from pixiu_app import backend_app as _pixiu_app  # noqa: E402
 
 app = FastAPI(title="貔貅学长 EdgeOne API")
 app.router.routes.extend(_pixiu_app.router.routes)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://pixiu-cmb-finals2.pages.dev",
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
