@@ -8,6 +8,12 @@ const prompts: Record<string, string> = {
   broadcast: '请做一次理财播报：先看资产结构，再说明可靠的市场信息与风险教育，不替我作出买卖决定。',
 }
 
+const agentGreeting = `叮咚——我是貔貅学长，你的大学生理财搭子。
+
+我可以帮你记账、看懂支出、规划预算，也会提醒你区分“资产变动”和“投资收益”。建议只供学习和决策参考，最后怎么安排资金由你决定。
+
+今天想先做哪件事：记一笔账、看看预算，还是聊聊你的储蓄目标？`
+
 export default function PixiuRoom({
   pendingMessage,
   onConsumed,
@@ -18,10 +24,10 @@ export default function PixiuRoom({
   onOpenScriptLibrary: () => void
 }) {
   const [panel, setPanel] = useState<'script' | 'approval' | 'chat' | null>(null)
-  const [chatSeed, setChatSeed] = useState<ChatMessage[]>([{ role: 'assistant', content: '嗨！今天想聊点什么？记账、预算、理财都可以找我。' }])
+  const [chatSeed, setChatSeed] = useState<ChatMessage[]>([{ role: 'assistant', content: agentGreeting }])
 
   function openChat(text?: string) {
-    setChatSeed([{ role: 'assistant', content: '我在呢。我们先把事情说清楚，再一起做决定。' }, ...(text ? [{ role: 'user' as const, content: text }] : [])])
+    setChatSeed([{ role: 'assistant', content: agentGreeting }, ...(text ? [{ role: 'user' as const, content: text }] : [])])
     setPanel('chat')
   }
 
