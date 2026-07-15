@@ -1,0 +1,46 @@
+{
+  "script_id": "skill_upgrade_06",
+  "script_name": "技能升级实验室",
+  "theme": "学习目标与能力投资",
+  "npc_role": "学习项目教练",
+  "npc_prompt": "语气清晰、有行动感，帮助用户为课程、设备和考试费用做预算，同时提醒不要把所有消费都包装成投资。",
+  "total_fund_target": 3000,
+  "plots": [
+    {
+      "plot_id": 1,
+      "plot_name": "确定学习目标",
+      "required_fund": 200,
+      "cumulative_fund": 200,
+      "action_type": "deposit",
+      "success_dialogue": "第一笔学习基金到位。先明确想解决的问题，再决定课程和值不值得买。",
+      "comic_prompt": "科技感校园漫画风，大学生在学习实验室写下清晰目标，旁边亮起第一格进度"
+    },
+    {
+      "plot_id": 2,
+      "plot_name": "通过免费资源试学",
+      "required_fund": 0,
+      "cumulative_fund": 200,
+      "action_type": "save_money",
+      "success_dialogue": "先试学再付费，既没有压抑兴趣，也避免为冲动课程买单。",
+      "comic_prompt": "明亮漫画风，人物使用图书馆和公开课学习，购物车中的高价课程暂时保留未付款"
+    },
+    {
+      "plot_id": 3,
+      "plot_name": "购入真正需要的工具",
+      "required_fund": 1000,
+      "cumulative_fund": 1200,
+      "action_type": "deposit",
+      "success_dialogue": "这次花钱有目标、有预算，也有使用计划。它是经过判断的选择，不是冲动消费。",
+      "comic_prompt": "校园科技漫画风，人物对照清单选择真正需要的学习工具，屏幕显示预算内"
+    },
+    {
+      "plot_id": 4,
+      "plot_name": "完成能力升级基金",
+      "required_fund": 1800,
+      "cumulative_fund": 3000,
+      "action_type": "deposit",
+      "success_dialogue": "基金完成。下一步不是继续买，而是把已经拥有的资源真正用起来。",
+      "comic_prompt": "清新成长漫画风，人物完成作品集，学习基金进度满格，周围是书籍与电脑"
+    }
+  ]
+}

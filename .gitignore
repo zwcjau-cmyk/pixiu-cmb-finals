@@ -1,0 +1,29 @@
+.DS_Store
+.uploads/
+.pycache_check/
+__pycache__/
+*.pyc
+
+# dependency and build outputs
+node_modules/
+dist/
+build/
+.next/
+.vite/
+
+# local secrets
+.env
+.env.*
+!.env.example
+
+# backend runtime data
+pixiu-agent-web/data/*.db
+pixiu-agent-web/data/*.json
+pixiu-agent-web/stickers/*
+pixiu-design/tmp/
+
+# large local delivery artifacts
+*.mp4
+*.zip
+*.docx
+*.pdf
