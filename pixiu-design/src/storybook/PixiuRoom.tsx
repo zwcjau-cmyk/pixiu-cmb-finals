@@ -4,7 +4,7 @@ import { ApprovalMailbox, RoomChatOverlay, type ChatMessage } from './StorybookP
 
 const prompts: Record<string, string> = {
   diagnosis: '请根据我近三个月的记录做一次省钱诊断，先说明数据是否足够，再给我 2—3 条具体建议。',
-  budget: '请根据我近一个月的收支记录帮我规划预算，不要机械套用固定比例，并说明计算口径。',
+  budget: '请帮我规划预算：有真实收支就据此个性化；数据不足也先按合理假设给省钱版、标准版、舒适版三档方案，校验分项与总额后再集中问我真正影响预算的信息。',
   broadcast: '请做一次理财播报：先看资产结构，再说明可靠的市场信息与风险教育，不替我作出买卖决定。',
 }
 

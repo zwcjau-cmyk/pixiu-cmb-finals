@@ -1,6 +1,7 @@
-"""金库资金管理工具 - 管理活期池、定期舱、基金图鉴和梦想清单，按 user_id 隔离存储"""
+"""金库资金管理工具 - 管理零钱、定期存款、投资理财和梦想清单，按 user_id 隔离存储"""
 import json
 import copy
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Optional
 from agno.tools import Toolkit
@@ -10,6 +11,8 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # 使用 mock_data.py 中的完整版 DEFAULT_VAULT（含 products/transactions/principal/monthly_profit）
 from data.mock_data import DEFAULT_VAULT
+
+_CN_TZ = timezone(timedelta(hours=8))
 
 
 def _get_user_vault_file(user_id: str) -> Path:
@@ -21,13 +24,97 @@ def _get_user_vault_file(user_id: str) -> Path:
 def _load_vault(user_id: str = "default_user") -> dict:
     vault_file = _get_user_vault_file(user_id)
     if vault_file.exists():
-        return json.loads(vault_file.read_text(encoding="utf-8"))
+        data = json.loads(vault_file.read_text(encoding="utf-8"))
+        accounts = data.get("accounts", {})
+        if "active_pool" in accounts:
+            accounts["active_pool"]["label"] = "零钱"
+        if "fixed_deposit" in accounts:
+            accounts["fixed_deposit"]["label"] = "定期存款"
+        if "fund_collection" in accounts:
+            accounts["fund_collection"]["label"] = "投资理财"
+        return data
     return copy.deepcopy(DEFAULT_VAULT)
 
 
 def _save_vault(data: dict, user_id: str = "default_user"):
     vault_file = _get_user_vault_file(user_id)
     vault_file.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def apply_ledger_cash_flow(
+    user_id: str,
+    amount: float,
+    flow_type: str,
+    description: str = "",
+    date: Optional[str] = None,
+) -> dict:
+    """将记账收支同步到零钱。
+
+    支出从银行卡余额开始依次扣减，收入默认进入银行卡余额。
+    如果已知活期余额不足，仅扣减可用余额并返回未匹配金额，不会制造负的存款余额。
+    """
+    if flow_type not in {"expense", "income"} or amount <= 0:
+        return {"success": False, "message": "收支类型或金额不正确"}
+
+    data = _load_vault(user_id)
+    account = data["accounts"]["active_pool"]
+    products = account.setdefault("products", [])
+    requested = float(amount)
+    applied = requested
+
+    if flow_type == "expense":
+        applied = min(requested, max(float(account.get("balance", 0)), 0.0))
+        remaining = applied
+        for product in products:
+            deduction = min(float(product.get("amount", 0)), remaining)
+            product["amount"] = round(float(product.get("amount", 0)) - deduction, 2)
+            remaining = round(remaining - deduction, 2)
+            if remaining <= 0:
+                break
+        signed_amount = -applied
+        transaction_type = "out"
+        transaction_description = f"记账支出：{description or '日常消费'}"
+    else:
+        if products:
+            products[0]["amount"] = round(float(products[0].get("amount", 0)) + requested, 2)
+        signed_amount = requested
+        transaction_type = "in"
+        transaction_description = f"记账收入：{description or '其他收入'}"
+
+    account["balance"] = round(float(account.get("balance", 0)) + signed_amount, 2)
+    account["principal"] = account["balance"]
+    data["total_assets"] = round(sum(float(item.get("balance", 0)) for item in data["accounts"].values()), 2)
+    data["monthly_net_flow"] = round(float(data.get("monthly_net_flow", 0)) + signed_amount, 2)
+    month = (date or datetime.now(_CN_TZ).strftime("%Y-%m-%d"))[:7]
+    history = data.setdefault("monthly_history", [])
+    month_row = next((row for row in history if row.get("month") == month), None)
+    if month_row is None:
+        month_row = {"month": month, "income": 0.0, "expense": 0.0}
+        history.append(month_row)
+        history.sort(key=lambda row: row.get("month", ""))
+    month_row[flow_type] = round(float(month_row.get(flow_type, 0)) + requested, 2)
+    month_row.update({
+        "cash": account["balance"],
+        "fixed_deposit": float(data["accounts"]["fixed_deposit"]["balance"]),
+        "investment": float(data["accounts"]["fund_collection"]["balance"]),
+        "total_assets": data["total_assets"],
+    })
+    account.setdefault("transactions", []).insert(0, {
+        "type": transaction_type,
+        "amount": applied if flow_type == "expense" else requested,
+        "date": date or datetime.now(_CN_TZ).strftime("%Y-%m-%d"),
+        "description": transaction_description,
+    })
+    _save_vault(data, user_id)
+
+    return {
+        "success": True,
+        "fully_applied": applied == requested,
+        "applied_amount": applied,
+        "unfunded_amount": round(requested - applied, 2),
+        "new_balance": account["balance"],
+        "total_assets": data["total_assets"],
+    }
 
 
 class VaultManagerTool(Toolkit):
@@ -39,7 +126,7 @@ class VaultManagerTool(Toolkit):
         self.register(self.update_goal_progress)
 
     def get_vault_status(self) -> str:
-        """获取用户金库的整体状态，包括总资产、活期池、定期舱、基金图鉴的余额以及梦想清单进度。
+        """获取用户金库的整体状态，包括总资产、零钱、定期存款、投资理财的余额以及梦想清单进度。
 
         Returns:
             金库完整状态 JSON
@@ -52,9 +139,9 @@ class VaultManagerTool(Toolkit):
 
         Args:
             account: 账户类型，可选值：
-                - "active_pool"（活期池）
-                - "fixed_deposit"（定期舱）
-                - "fund_collection"（基金图鉴）
+                - "active_pool"（零钱）
+                - "fixed_deposit"（定期存款）
+                - "fund_collection"（投资理财）
             amount: 存入金额（正数表示存入，负数表示取出）
 
         Returns:

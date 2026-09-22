@@ -1,6 +1,66 @@
-# 预制 mock 收支数据（大学生5月日常开销，和金库 fallback 对得上）
+# 预制 mock 收支数据（大学生 1–9 月日常开销，更新至 2026-09-20）
 DEFAULT_EXPENSES = {
     "records": [
+        # ---- 9月（截至20日） ----
+        {"category": "餐饮", "amount": 24.0, "description": "周末早午餐", "type": "expense", "date": "2026-09-20", "created_at": "2026-09-20T11:20:00"},
+        {"category": "娱乐", "amount": 35.0, "description": "和室友看电影AA", "type": "expense", "date": "2026-09-20", "created_at": "2026-09-20T19:10:00"},
+        {"category": "餐饮", "amount": 16.0, "description": "食堂午饭", "type": "expense", "date": "2026-09-19", "created_at": "2026-09-19T12:10:00"},
+        {"category": "购物", "amount": 28.0, "description": "购买笔记本和便签", "type": "expense", "date": "2026-09-18", "created_at": "2026-09-18T16:30:00"},
+        {"category": "餐饮", "amount": 22.0, "description": "晚饭+水果", "type": "expense", "date": "2026-09-18", "created_at": "2026-09-18T18:40:00"},
+        {"category": "交通", "amount": 8.0, "description": "地铁去实习", "type": "expense", "date": "2026-09-17", "created_at": "2026-09-17T08:10:00"},
+        {"category": "餐饮", "amount": 18.0, "description": "食堂午饭+酸奶", "type": "expense", "date": "2026-09-16", "created_at": "2026-09-16T12:20:00"},
+        {"category": "其他", "amount": 30.0, "description": "话费充值", "type": "expense", "date": "2026-09-15", "created_at": "2026-09-15T10:00:00"},
+        {"category": "餐饮", "amount": 26.0, "description": "外卖晚饭", "type": "expense", "date": "2026-09-14", "created_at": "2026-09-14T18:50:00"},
+        {"category": "兼职", "amount": 600.0, "description": "家教费用到账", "type": "income", "date": "2026-09-13", "created_at": "2026-09-13T09:30:00"},
+        {"category": "交通", "amount": 12.0, "description": "公交地铁往返", "type": "expense", "date": "2026-09-13", "created_at": "2026-09-13T20:10:00"},
+        {"category": "餐饮", "amount": 38.0, "description": "和同学吃麻辣烫", "type": "expense", "date": "2026-09-12", "created_at": "2026-09-12T19:20:00"},
+        {"category": "餐饮", "amount": 15.0, "description": "食堂午饭", "type": "expense", "date": "2026-09-11", "created_at": "2026-09-11T12:00:00"},
+        {"category": "购物", "amount": 45.0, "description": "宿舍日用品补货", "type": "expense", "date": "2026-09-10", "created_at": "2026-09-10T17:00:00"},
+        {"category": "餐饮", "amount": 20.0, "description": "早餐+午饭", "type": "expense", "date": "2026-09-09", "created_at": "2026-09-09T12:30:00"},
+        {"category": "交通", "amount": 6.0, "description": "公交去图书馆", "type": "expense", "date": "2026-09-08", "created_at": "2026-09-08T08:20:00"},
+        {"category": "餐饮", "amount": 32.0, "description": "和室友吃烧烤AA", "type": "expense", "date": "2026-09-07", "created_at": "2026-09-07T20:00:00"},
+        {"category": "学习", "amount": 49.0, "description": "购买网课资料", "type": "expense", "date": "2026-09-06", "created_at": "2026-09-06T14:00:00"},
+        {"category": "餐饮", "amount": 17.0, "description": "食堂晚饭", "type": "expense", "date": "2026-09-05", "created_at": "2026-09-05T18:10:00"},
+        {"category": "购物", "amount": 86.0, "description": "开学补购生活用品", "type": "expense", "date": "2026-09-03", "created_at": "2026-09-03T16:20:00"},
+        {"category": "餐饮", "amount": 42.0, "description": "开学聚餐AA", "type": "expense", "date": "2026-09-02", "created_at": "2026-09-02T19:00:00"},
+        {"category": "生活费", "amount": 2000.0, "description": "妈妈转了九月生活费", "type": "income", "date": "2026-09-01", "created_at": "2026-09-01T09:00:00"},
+        # ---- 8月 ----
+        {"category": "交通", "amount": 45.0, "description": "打车去火车站", "type": "expense", "date": "2026-08-30", "created_at": "2026-08-30T07:20:00"},
+        {"category": "购物", "amount": 128.0, "description": "购买新学期教材", "type": "expense", "date": "2026-08-28", "created_at": "2026-08-28T15:00:00"},
+        {"category": "餐饮", "amount": 48.0, "description": "和朋友聚餐AA", "type": "expense", "date": "2026-08-25", "created_at": "2026-08-25T19:30:00"},
+        {"category": "其他", "amount": 30.0, "description": "话费充值", "type": "expense", "date": "2026-08-20", "created_at": "2026-08-20T10:00:00"},
+        {"category": "娱乐", "amount": 60.0, "description": "博物馆特展门票", "type": "expense", "date": "2026-08-16", "created_at": "2026-08-16T13:00:00"},
+        {"category": "餐饮", "amount": 25.0, "description": "冷面+水果茶", "type": "expense", "date": "2026-08-16", "created_at": "2026-08-16T18:00:00"},
+        {"category": "兼职", "amount": 800.0, "description": "暑期实习补贴", "type": "income", "date": "2026-08-15", "created_at": "2026-08-15T09:30:00"},
+        {"category": "交通", "amount": 12.0, "description": "地铁往返实习点", "type": "expense", "date": "2026-08-12", "created_at": "2026-08-12T18:30:00"},
+        {"category": "餐饮", "amount": 19.0, "description": "实习园区午餐", "type": "expense", "date": "2026-08-10", "created_at": "2026-08-10T12:10:00"},
+        {"category": "购物", "amount": 72.0, "description": "买防晒和洗护用品", "type": "expense", "date": "2026-08-06", "created_at": "2026-08-06T16:00:00"},
+        {"category": "餐饮", "amount": 36.0, "description": "和家人吃夜宵", "type": "expense", "date": "2026-08-03", "created_at": "2026-08-03T21:00:00"},
+        {"category": "生活费", "amount": 1500.0, "description": "爸爸转了八月生活费", "type": "income", "date": "2026-08-01", "created_at": "2026-08-01T09:00:00"},
+        # ---- 7月 ----
+        {"category": "餐饮", "amount": 55.0, "description": "暑期同学聚餐AA", "type": "expense", "date": "2026-07-30", "created_at": "2026-07-30T19:30:00"},
+        {"category": "购物", "amount": 39.0, "description": "买书和文具", "type": "expense", "date": "2026-07-26", "created_at": "2026-07-26T15:20:00"},
+        {"category": "其他", "amount": 30.0, "description": "话费充值", "type": "expense", "date": "2026-07-20", "created_at": "2026-07-20T10:00:00"},
+        {"category": "兼职", "amount": 700.0, "description": "线上家教收入", "type": "income", "date": "2026-07-18", "created_at": "2026-07-18T09:00:00"},
+        {"category": "交通", "amount": 10.0, "description": "地铁去兼职", "type": "expense", "date": "2026-07-18", "created_at": "2026-07-18T08:00:00"},
+        {"category": "餐饮", "amount": 28.0, "description": "外卖晚饭+饮料", "type": "expense", "date": "2026-07-15", "created_at": "2026-07-15T18:40:00"},
+        {"category": "娱乐", "amount": 45.0, "description": "和朋友看电影", "type": "expense", "date": "2026-07-11", "created_at": "2026-07-11T19:10:00"},
+        {"category": "餐饮", "amount": 32.0, "description": "火锅聚餐AA", "type": "expense", "date": "2026-07-08", "created_at": "2026-07-08T19:30:00"},
+        {"category": "交通", "amount": 22.0, "description": "公交地铁一日往返", "type": "expense", "date": "2026-07-05", "created_at": "2026-07-05T20:00:00"},
+        {"category": "生活费", "amount": 1500.0, "description": "妈妈转了七月生活费", "type": "income", "date": "2026-07-01", "created_at": "2026-07-01T09:00:00"},
+        # ---- 6月 ----
+        {"category": "餐饮", "amount": 46.0, "description": "期末寝室聚餐AA", "type": "expense", "date": "2026-06-29", "created_at": "2026-06-29T19:30:00"},
+        {"category": "购物", "amount": 18.0, "description": "打印复习资料", "type": "expense", "date": "2026-06-25", "created_at": "2026-06-25T14:20:00"},
+        {"category": "餐饮", "amount": 21.0, "description": "复习周晚饭+咖啡", "type": "expense", "date": "2026-06-23", "created_at": "2026-06-23T19:00:00"},
+        {"category": "其他", "amount": 30.0, "description": "话费充值", "type": "expense", "date": "2026-06-20", "created_at": "2026-06-20T10:00:00"},
+        {"category": "兼职", "amount": 500.0, "description": "家教收入到账", "type": "income", "date": "2026-06-18", "created_at": "2026-06-18T09:00:00"},
+        {"category": "餐饮", "amount": 16.0, "description": "食堂午饭", "type": "expense", "date": "2026-06-16", "created_at": "2026-06-16T12:00:00"},
+        {"category": "娱乐", "amount": 38.0, "description": "端午看电影AA", "type": "expense", "date": "2026-06-10", "created_at": "2026-06-10T19:00:00"},
+        {"category": "餐饮", "amount": 32.0, "description": "端午粽子和聚餐AA", "type": "expense", "date": "2026-06-10", "created_at": "2026-06-10T12:30:00"},
+        {"category": "交通", "amount": 12.0, "description": "地铁去商场", "type": "expense", "date": "2026-06-06", "created_at": "2026-06-06T10:00:00"},
+        {"category": "餐饮", "amount": 18.0, "description": "食堂午饭+水果", "type": "expense", "date": "2026-06-03", "created_at": "2026-06-03T12:20:00"},
+        {"category": "生活费", "amount": 1800.0, "description": "爸爸转了六月生活费", "type": "income", "date": "2026-06-01", "created_at": "2026-06-01T08:50:00"},
+        # ---- 5月 ----
         {"category": "餐饮", "amount": 18.0, "description": "食堂午饭+酸奶", "type": "expense", "date": "2026-05-18", "created_at": "2026-05-18T12:30:00"},
         {"category": "交通", "amount": 6.0, "description": "地铁去图书馆", "type": "expense", "date": "2026-05-18", "created_at": "2026-05-18T09:00:00"},
         {"category": "餐饮", "amount": 35.0, "description": "和室友吃麻辣烫", "type": "expense", "date": "2026-05-17", "created_at": "2026-05-17T19:00:00"},
@@ -115,68 +175,151 @@ DEFAULT_EXPENSES = {
         {"category": "生活费", "amount": 500.0, "description": "过年爷爷奶奶红包", "type": "income", "date": "2026-01-28", "created_at": "2026-01-28T10:00:00"},
         {"category": "生活费", "amount": 2000.0, "description": "妈妈转了一月生活费", "type": "income", "date": "2026-01-01", "created_at": "2026-01-01T09:00:00"},
     ],
-    "monthly_summary": {"total_expense": 1044.0, "total_income": 2500.0}
+    "monthly_summary": {"total_expense": 4185.0, "total_income": 20750.0}
+}
+
+# 补齐每月校园卡、交通、学习和生活用品等常规开销。
+# 这些记录与下方财富金库的月度余额轨迹保持一致。
+_MOCK_BALANCING_EXPENSES = [
+    ("2026-01-05", "餐饮", 650.0, "一月校园卡餐费充值"),
+    ("2026-01-09", "购物", 420.0, "寒假日用品和年货"),
+    ("2026-01-16", "交通", 260.0, "寒假往返车票"),
+    ("2026-01-26", "其他", 258.0, "手机、网络及生活杂费"),
+    ("2026-02-03", "餐饮", 520.0, "二月校园卡餐费充值"),
+    ("2026-02-09", "交通", 300.0, "返校交通费"),
+    ("2026-02-17", "购物", 220.0, "开学生活用品"),
+    ("2026-02-26", "其他", 187.0, "网费及宿舍杂费"),
+    ("2026-03-06", "餐饮", 680.0, "三月校园卡餐费充值"),
+    ("2026-03-12", "学习", 450.0, "教材和课程资料"),
+    ("2026-03-18", "购物", 350.0, "换季生活用品"),
+    ("2026-03-29", "其他", 257.0, "网费、水电及生活杂费"),
+    ("2026-04-06", "餐饮", 620.0, "四月校园卡餐费充值"),
+    ("2026-04-12", "娱乐", 420.0, "春游及同学活动AA"),
+    ("2026-04-19", "购物", 320.0, "换季衣物和日用品"),
+    ("2026-04-29", "其他", 261.0, "网费、水电及生活杂费"),
+    ("2026-05-06", "餐饮", 560.0, "五月校园卡餐费充值"),
+    ("2026-05-11", "娱乐", 360.0, "假期活动及同学聚会AA"),
+    ("2026-05-19", "购物", 300.0, "夏季生活用品"),
+    ("2026-05-28", "其他", 208.0, "网费、水电及生活杂费"),
+    ("2026-06-05", "餐饮", 720.0, "六月校园卡餐费充值"),
+    ("2026-06-12", "学习", 500.0, "期末复习和课程材料"),
+    ("2026-06-21", "交通", 400.0, "期末及往返交通费"),
+    ("2026-06-30", "其他", 299.0, "网费、水电及生活杂费"),
+    ("2026-07-04", "餐饮", 680.0, "七月日常餐费"),
+    ("2026-07-10", "学习", 450.0, "暑期课程和资料"),
+    ("2026-07-19", "交通", 360.0, "暑期实习交通费"),
+    ("2026-07-29", "其他", 299.0, "手机、网络及生活杂费"),
+    ("2026-08-05", "餐饮", 650.0, "八月日常餐费"),
+    ("2026-08-13", "交通", 420.0, "实习通勤和往返交通"),
+    ("2026-08-21", "购物", 350.0, "开学前生活用品"),
+    ("2026-08-29", "其他", 255.0, "手机、网络及生活杂费"),
+    ("2026-09-04", "餐饮", 620.0, "九月校园卡餐费充值"),
+    ("2026-09-08", "学习", 360.0, "新学期教材和课程资料"),
+    ("2026-09-14", "购物", 280.0, "开学生活用品"),
+    ("2026-09-20", "其他", 171.0, "网费、水电及生活杂费"),
+]
+
+DEFAULT_EXPENSES["records"].extend({
+    "category": category,
+    "amount": amount,
+    "description": description,
+    "type": "expense",
+    "date": date,
+    "created_at": f"{date}T20:30:00",
+} for date, category, amount, description in _MOCK_BALANCING_EXPENSES)
+DEFAULT_EXPENSES["records"].sort(key=lambda record: record["created_at"], reverse=True)
+DEFAULT_EXPENSES["monthly_summary"] = {
+    "total_expense": sum(record["amount"] for record in DEFAULT_EXPENSES["records"] if record["type"] == "expense"),
+    "total_income": sum(record["amount"] for record in DEFAULT_EXPENSES["records"] if record["type"] == "income"),
 }
 
 # 预制 mock 金库数据
 DEFAULT_VAULT = {
-    "total_assets": 13579.30,
-    "monthly_growth": 856,
+    "is_demo_seeded": True,
+    "total_assets": 10150.00,
+    "monthly_growth": 0,
+    "monthly_net_flow": 600.00,
+    "opening_balance": 8000.00,
     "accounts": {
         "active_pool": {
-            "label": "活期池",
-            "balance": 3428.50,
-            "rate": "1.8%",
-            "principal": 3400.00,
-            "monthly_profit": 28.50,
+            "label": "零钱",
+            "balance": 6150.00,
+            "rate": "随时可用",
+            "principal": 6150.00,
+            "monthly_profit": 0.00,
             "products": [
-                {"name": "朝朝盈2号", "amount": 2000.00, "buy_date": "2026-03-01", "rate": "1.85%"},
-                {"name": "招商活钱管家", "amount": 1000.00, "buy_date": "2026-04-10", "rate": "1.72%"},
-                {"name": "零钱宝", "amount": 428.50, "buy_date": "2026-05-05", "rate": "1.65%"}
+                {"name": "招商银行卡余额", "amount": 3300.00, "buy_date": "2026-09-20", "rate": "随时可用", "source": "bank_card"},
+                {"name": "支付宝零钱", "amount": 1800.00, "buy_date": "2026-09-20", "rate": "随时可用", "source": "alipay"},
+                {"name": "微信零钱", "amount": 1050.00, "buy_date": "2026-09-20", "rate": "随时可用", "source": "wechat"}
             ],
             "transactions": [
-                {"type": "in", "amount": 428.50, "date": "2026-05-05", "description": "转入零钱宝"},
-                {"type": "in", "amount": 1000.00, "date": "2026-04-10", "description": "转入招商活钱管家"},
-                {"type": "in", "amount": 2000.00, "date": "2026-03-01", "description": "首次转入朝朝盈2号"}
+                {"type": "in", "amount": 428.50, "date": "2026-09-01", "description": "微信零钱余额"},
+                {"type": "in", "amount": 1000.00, "date": "2026-09-01", "description": "支付宝零钱余额"},
+                {"type": "in", "amount": 2000.00, "date": "2026-09-01", "description": "银行卡活期余额"}
             ]
         },
         "fixed_deposit": {
-            "label": "定期舱",
-            "balance": 8000.00,
-            "rate": "3.2%",
-            "term": "90天",
-            "principal": 8000.00,
-            "monthly_profit": 64.00,
+            "label": "定期存款",
+            "balance": 2500.00,
+            "rate": "1.30%",
+            "term": "3–6个月",
+            "principal": 2500.00,
+            "monthly_profit": 2.50,
             "products": [
-                {"name": "招银理财90天", "amount": 5000.00, "buy_date": "2026-03-15", "rate": "3.2%", "maturity_date": "2026-06-13"},
-                {"name": "招银理财60天", "amount": 3000.00, "buy_date": "2026-04-01", "rate": "3.0%", "maturity_date": "2026-05-31"}
+                {"name": "银行六个月定期存款", "amount": 1500.00, "buy_date": "2026-04-15", "rate": "1.10%", "maturity_date": "2026-10-15"},
+                {"name": "银行六个月定期存款", "amount": 1000.00, "buy_date": "2026-08-20", "rate": "1.30%", "maturity_date": "2027-02-20"}
             ],
             "transactions": [
-                {"type": "in", "amount": 3000.00, "date": "2026-04-01", "description": "买入招银理财60天"},
-                {"type": "in", "amount": 5000.00, "date": "2026-03-15", "description": "买入招银理财90天"}
+                {"type": "in", "amount": 1000.00, "date": "2026-08-20", "description": "从零钱转入六个月定期存款"},
+                {"type": "in", "amount": 1500.00, "date": "2026-04-15", "description": "从零钱转入六个月定期存款"}
             ]
         },
         "fund_collection": {
-            "label": "基金图鉴",
-            "balance": 2150.80,
-            "rate": "+2.3%",
-            "principal": 2100.00,
-            "monthly_profit": 50.80,
+            "label": "投资理财",
+            "balance": 1500.00,
+            "rate": "+1.2%",
+            "principal": 1500.00,
+            "monthly_profit": 18.00,
             "products": [
-                {"name": "沪深300指数A", "amount": 1000.00, "buy_date": "2026-02-20", "rate": "+3.1%", "code": "000300"},
-                {"name": "中证500增强", "amount": 600.00, "buy_date": "2026-03-10", "rate": "+1.8%", "code": "000905"},
-                {"name": "纯债基金C", "amount": 500.00, "buy_date": "2026-04-05", "rate": "+0.9%", "code": "007531"}
+                {"name": "沪深300指数A", "amount": 1000.00, "buy_date": "2026-06-18", "rate": "+1.5%", "code": "000300"},
+                {"name": "纯债基金C", "amount": 500.00, "buy_date": "2026-03-18", "rate": "+0.8%", "code": "007531"}
             ],
             "transactions": [
-                {"type": "in", "amount": 500.00, "date": "2026-04-05", "description": "定投纯债基金C"},
-                {"type": "in", "amount": 600.00, "date": "2026-03-10", "description": "买入中证500增强"},
-                {"type": "in", "amount": 1000.00, "date": "2026-02-20", "description": "首次买入沪深300指数A"}
+                {"type": "in", "amount": 1000.00, "date": "2026-06-18", "description": "从零钱买入沪深300指数A"},
+                {"type": "in", "amount": 500.00, "date": "2026-03-18", "description": "从零钱买入纯债基金C"}
             ]
         }
     },
+    "monthly_history": [
+        {"month": "2026-01", "income": 2500.0, "expense": 2100.0, "cash": 8400.0, "fixed_deposit": 0.0, "investment": 0.0, "total_assets": 8400.0},
+        {"month": "2026-02", "income": 1800.0, "expense": 1650.0, "cash": 8550.0, "fixed_deposit": 0.0, "investment": 0.0, "total_assets": 8550.0},
+        {"month": "2026-03", "income": 2350.0, "expense": 2100.0, "cash": 8300.0, "fixed_deposit": 0.0, "investment": 500.0, "total_assets": 8800.0},
+        {"month": "2026-04", "income": 2200.0, "expense": 2050.0, "cash": 6950.0, "fixed_deposit": 1500.0, "investment": 500.0, "total_assets": 8950.0},
+        {"month": "2026-05", "income": 2500.0, "expense": 2350.0, "cash": 7100.0, "fixed_deposit": 1500.0, "investment": 500.0, "total_assets": 9100.0},
+        {"month": "2026-06", "income": 2300.0, "expense": 2150.0, "cash": 6250.0, "fixed_deposit": 1500.0, "investment": 1500.0, "total_assets": 9250.0},
+        {"month": "2026-07", "income": 2200.0, "expense": 2050.0, "cash": 6400.0, "fixed_deposit": 1500.0, "investment": 1500.0, "total_assets": 9400.0},
+        {"month": "2026-08", "income": 2300.0, "expense": 2150.0, "cash": 5550.0, "fixed_deposit": 2500.0, "investment": 1500.0, "total_assets": 9550.0},
+        {"month": "2026-09", "income": 2600.0, "expense": 2000.0, "cash": 6150.0, "fixed_deposit": 2500.0, "investment": 1500.0, "total_assets": 10150.0}
+    ],
     "goals": [
         {"name": "AirPods Pro", "target": 1799, "current": 1295, "emoji": "🎧"},
         {"name": "毕业旅行基金", "target": 5000, "current": 2250, "emoji": "✈️"},
         {"name": "新款iPad", "target": 3499, "current": 980, "emoji": "📱"}
     ]
 }
+
+DEFAULT_VAULT["accounts"]["active_pool"]["transactions"] = sorted([
+    {
+        "type": "out" if record["type"] == "expense" else "in",
+        "amount": record["amount"],
+        "date": record["date"],
+        "description": f"{'支出' if record['type'] == 'expense' else '收入'}：{record['description']}",
+    }
+    for record in DEFAULT_EXPENSES["records"]
+] + [
+    {"type": "in", "amount": 8000.0, "date": "2026-01-01", "description": "期初零钱余额"},
+    {"type": "out", "amount": 500.0, "date": "2026-03-18", "description": "转入投资理财"},
+    {"type": "out", "amount": 1500.0, "date": "2026-04-15", "description": "转入定期存款"},
+    {"type": "out", "amount": 1000.0, "date": "2026-06-18", "description": "转入投资理财"},
+    {"type": "out", "amount": 1000.0, "date": "2026-08-20", "description": "转入定期存款"},
+], key=lambda item: item["date"], reverse=True)

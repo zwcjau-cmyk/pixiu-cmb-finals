@@ -1,5 +1,6 @@
 """日记转账单工具 - 从用户自然语言中提取消费记录，按 user_id 隔离存储"""
 import json
+import copy
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Optional
@@ -60,7 +61,15 @@ def _load_expenses_for_write(user_id: str = "default_user") -> dict:
                 return data
         except (json.JSONDecodeError, KeyError):
             pass
-    return {"records": [], "monthly_summary": {"total_expense": 0, "total_income": 0}}
+    # 体验环境在首次记账时从同一份 mock 基线开始，
+    # 保证藏宝阁历史收支与财富金库当前余额自洽。
+    try:
+        from data.mock_data import DEFAULT_EXPENSES
+        seeded = copy.deepcopy(DEFAULT_EXPENSES)
+        seeded["is_demo_seeded"] = True
+        return seeded
+    except ImportError:
+        return {"records": [], "monthly_summary": {"total_expense": 0, "total_income": 0}}
 
 
 def _save_expenses(data: dict, user_id: str = "default_user"):
@@ -102,11 +111,16 @@ class DiaryToLedgerTool(Toolkit):
         data["monthly_summary"]["total_expense"] = data["monthly_summary"].get("total_expense", 0) + amount
         _save_expenses(data, user_id)
 
+        # 未指定付款来源的日常支出，默认从财富金库的“零钱”扣减。
+        from tools.vault_manager import apply_ledger_cash_flow
+        vault_sync = apply_ledger_cash_flow(user_id, amount, "expense", description, record["date"])
+
         return json.dumps({
             "success": True,
             "record": record,
             "monthly_summary": data["monthly_summary"],
-            "message": f"已记录支出 ¥{amount}（{category}：{description}）"
+            "vault_sync": vault_sync,
+            "message": f"已记录支出 ¥{amount}（{category}：{description}），并同步扣减零钱"
         }, ensure_ascii=False)
 
     def record_income(self, category: str, amount: float, description: str = "", date: Optional[str] = None) -> str:
@@ -135,11 +149,16 @@ class DiaryToLedgerTool(Toolkit):
         data["monthly_summary"]["total_income"] = data["monthly_summary"].get("total_income", 0) + amount
         _save_expenses(data, user_id)
 
+        # 未指定去向的收入，默认进入财富金库的“零钱”。
+        from tools.vault_manager import apply_ledger_cash_flow
+        vault_sync = apply_ledger_cash_flow(user_id, amount, "income", description, record["date"])
+
         return json.dumps({
             "success": True,
             "record": record,
             "monthly_summary": data["monthly_summary"],
-            "message": f"已记录收入 ¥{amount}（{category}：{description}）"
+            "vault_sync": vault_sync,
+            "message": f"已记录收入 ¥{amount}（{category}：{description}），并同步增加零钱"
         }, ensure_ascii=False)
 
     def get_daily_summary(self, start_date: Optional[str] = None, end_date: Optional[str] = None) -> str:

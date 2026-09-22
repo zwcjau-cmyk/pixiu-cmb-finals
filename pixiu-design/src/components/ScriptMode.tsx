@@ -154,6 +154,10 @@ export default function ScriptMode({ onBack, initialScript, customPrompt }: Scri
         }),
       })
 
+      if (!res.ok || !res.body) {
+        throw new Error(`Script chat request failed: ${res.status}`)
+      }
+
       let agentContent = ''
       let imageUrl: string | undefined
 
@@ -251,6 +255,10 @@ export default function ScriptMode({ onBack, initialScript, customPrompt }: Scri
         }),
       })
 
+      if (!res.ok || !res.body) {
+        throw new Error(`Script chat request failed: ${res.status}`)
+      }
+
       let agentContent = ''
       let imageUrl: string | undefined
 
@@ -323,7 +331,12 @@ export default function ScriptMode({ onBack, initialScript, customPrompt }: Scri
         .catch(() => {})
     } catch {
       const errorMsg: Message = { type: 'agent', content: '剧情导演暂时开小差了...请稍后再试 😅', time: getTimeStr() }
-      setMessages(prev => [...prev, errorMsg])
+      setMessages(prev => {
+        const lastMessage = prev[prev.length - 1]
+        return lastMessage?.type === 'agent' && !lastMessage.content
+          ? [...prev.slice(0, -1), errorMsg]
+          : [...prev, errorMsg]
+      })
     } finally {
       setLoading(false)
     }

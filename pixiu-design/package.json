@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bun --hot ./index.html",
+    "dev": "bun run build && PORT=3000 bun ./serve.ts",
     "build": "bun ./build.ts",
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint .",

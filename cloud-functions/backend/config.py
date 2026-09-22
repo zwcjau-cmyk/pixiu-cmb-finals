@@ -9,6 +9,7 @@ ARK_API_KEY = os.getenv("ARK_API_KEY")
 ARK_BASE_URL = os.getenv("ARK_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3")
 
 # 模型配置
+MODEL_MAIN = os.getenv("ARK_MODEL_MAIN", "deepseek-v4-1-flash-260910")
 MODEL_PRO = os.getenv("ARK_MODEL_PRO", "doubao-seed-2-0-pro-260215")
 MODEL_CHARACTER = os.getenv("ARK_MODEL_CHARACTER", "doubao-seed-character-251128")
 MODEL_VISION = os.getenv("ARK_MODEL_VISION", "doubao-seed-2-0-pro-260215")
@@ -22,5 +23,6 @@ if not ARK_API_KEY:
         "You can add it to .env file in pixiu-agent-web/ directory:\n"
         "ARK_API_KEY=your-ark-api-key\n"
         "ARK_BASE_URL=https://ark.cn-beijing.volces.com/api/v3\n"
+        "ARK_MODEL_MAIN=deepseek-v4-1-flash-260910\n"
         "ARK_MODEL_CHARACTER=doubao-seed-character-251128"
     )

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowLeft, Check, ChevronRight, FileSpreadsheet, Send, ShieldCheck, X } from 'lucide-react'
+import { ArrowLeft, Check, ChevronRight, FileSpreadsheet, LoaderCircle, Mic, Send, ShieldCheck, Square, X } from 'lucide-react'
 import { API_BASE, getUserId } from '../config'
 
 export function PaperSheet({ title, subtitle, children, onClose, className = '' }: {
@@ -97,7 +97,11 @@ export function RoomChatOverlay({ initialMessages, onClose }: { initialMessages:
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [sessionId] = useState(() => crypto.randomUUID())
+  const [voiceState, setVoiceState] = useState<'idle' | 'recording' | 'recognizing'>('idle')
+  const [voiceHint, setVoiceHint] = useState('')
   const seedRequested = useRef(false)
+  const recorderRef = useRef<MediaRecorder | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
 
   async function requestAnswer(text: string, appendUser = true) {
     const clean = text.trim()
@@ -149,6 +153,77 @@ export function RoomChatOverlay({ initialMessages, onClose }: { initialMessages:
     }
   }, [])
 
+  useEffect(() => () => {
+    if (recorderRef.current?.state === 'recording') {
+      recorderRef.current.onstop = null
+      recorderRef.current.stop()
+    }
+    streamRef.current?.getTracks().forEach(track => track.stop())
+  }, [])
+
+  async function transcribe(blob: Blob) {
+    if (!blob.size) return
+    setVoiceState('recognizing')
+    setVoiceHint('正在把语音变成文字…')
+    try {
+      const audioBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(String(reader.result).split(',')[1] || '')
+        reader.onerror = () => reject(reader.error)
+        reader.readAsDataURL(blob)
+      })
+      const extension = blob.type.includes('mp4') ? 'm4a' : blob.type.includes('ogg') ? 'ogg' : 'webm'
+      const response = await fetch(`${API_BASE}/api/speech/transcribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ audio_base64: audioBase64, mime_type: blob.type, filename: `recording.${extension}` }),
+      })
+      if (!response.ok) throw new Error('识别失败')
+      const data = await response.json() as { text?: string }
+      setInput(data.text?.trim() || '')
+      setVoiceHint(data.text ? '已识别，可以修改后发送' : '没有听清，再试一次吧')
+    } catch {
+      setVoiceHint('语音识别暂时不可用，请稍后再试')
+    } finally {
+      setVoiceState('idle')
+    }
+  }
+
+  async function toggleRecording() {
+    if (voiceState === 'recording') {
+      recorderRef.current?.stop()
+      return
+    }
+    if (voiceState !== 'idle') return
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      setVoiceHint('当前浏览器不支持录音，请改用文字输入')
+      return
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      streamRef.current = stream
+      const preferredType = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/ogg;codecs=opus']
+        .find(type => MediaRecorder.isTypeSupported(type))
+      const recorder = new MediaRecorder(stream, preferredType ? { mimeType: preferredType } : undefined)
+      const chunks: BlobPart[] = []
+      recorder.ondataavailable = event => { if (event.data.size) chunks.push(event.data) }
+      recorder.onstop = () => {
+        stream.getTracks().forEach(track => track.stop())
+        streamRef.current = null
+        void transcribe(new Blob(chunks, { type: recorder.mimeType || 'audio/webm' }))
+      }
+      recorderRef.current = recorder
+      recorder.start()
+      setVoiceState('recording')
+      setVoiceHint('正在录音，点方块结束')
+      window.setTimeout(() => {
+        if (recorder.state === 'recording') recorder.stop()
+      }, 60_000)
+    } catch {
+      setVoiceHint('需要允许麦克风权限才能语音输入')
+    }
+  }
+
   return (
     <section className="room-chat-layer" aria-label="与貔貅学长聊天">
       <div className="room-chat-heading"><span><i /> 学长正在听</span><button onClick={onClose} aria-label="收起聊天"><X size={17} /></button></div>
@@ -160,9 +235,13 @@ export function RoomChatOverlay({ initialMessages, onClose }: { initialMessages:
           </div>
         ))}
       </div>
+      {voiceHint && <div className="room-voice-hint" role="status">{voiceHint}</div>}
       <form className="room-chat-form" onSubmit={event => { event.preventDefault(); requestAnswer(input) }}>
         <input value={input} onChange={event => setInput(event.target.value)} placeholder="直接告诉学长：午饭花了 18 元…" autoFocus />
-        <button disabled={loading} aria-label="发送消息"><Send size={18} /></button>
+        <button className={`voice-button ${voiceState === 'recording' ? 'recording' : ''}`} type="button" disabled={voiceState === 'recognizing' || loading} onClick={toggleRecording} aria-label={voiceState === 'recording' ? '结束录音' : '语音输入'}>
+          {voiceState === 'recording' ? <Square size={15} fill="currentColor" /> : voiceState === 'recognizing' ? <LoaderCircle className="spin" size={17} /> : <Mic size={18} />}
+        </button>
+        <button className="send-button" disabled={loading || voiceState !== 'idle'} aria-label="发送消息"><Send size={18} /></button>
       </form>
     </section>
   )
@@ -230,7 +309,7 @@ export function ScriptShelf({ onClose }: { onClose: () => void }) {
 export function ApprovalMailbox({ onClose, onOpenChat }: { onClose: () => void; onOpenChat: (text: string) => void }) {
   return (
     <PaperSheet title="转出申请箱" subtitle="学长会通过你的申请，但也要督促你回顾你的花钱效用。" onClose={onClose}>
-      <div className="approval-card"><span>待回顾</span><b>课程报名 · ¥899</b><small>从活期池转出 · 今天 14:20</small><button onClick={() => onOpenChat('请回顾我这笔课程报名 ¥899 的转出申请，并完成形式审批。')}>请学长回顾 <ChevronRight size={15} /></button></div>
+      <div className="approval-card"><span>待回顾</span><b>课程报名 · ¥899</b><small>从零钱转出 · 今天 14:20</small><button onClick={() => onOpenChat('请回顾我这笔课程报名 ¥899 的转出申请，并完成形式审批。')}>请学长回顾 <ChevronRight size={15} /></button></div>
       <div className="approval-card done"><span><Check size={13} /> 已通过</span><b>周末出行 · ¥260</b><small>学长提醒：转出后本月旅行预算还剩 ¥340</small></div>
     </PaperSheet>
   )
@@ -284,27 +363,6 @@ export function MarketForecastLab({ onClose }: { onClose: () => void }) {
       <button className="storybook-primary" disabled={!judgement.trim()} onClick={savePrediction}>保存预测，30 天后复盘 <ChevronRight size={16} /></button>
       {saved && <p className="decision-feedback">已保存这次判断。一个月后可以拿真实走势回来复盘：判断对了什么，漏掉了什么。</p>}
       <small className="risk-note">这是判断训练，不构成投资建议，也不会连接真实交易。</small>
-    </PaperSheet>
-  )
-}
-
-export function TradePracticeLab({ onClose }: { onClose: () => void }) {
-  const [choice, setChoice] = useState<'buy' | 'wait' | null>(null)
-  const [round, setRound] = useState(0)
-  const prices = [42, 47, 44, 53, 49, 58, 55]
-  const visible = prices.slice(0, Math.min(4 + round, prices.length))
-  function decide(next: 'buy' | 'wait') { setChoice(next); setRound(value => Math.min(value + 1, 3)) }
-  return (
-    <PaperSheet title="涨跌练习场" subtitle="只练买卖手感：看走势、做选择、体会波动。" onClose={onClose} className="decision-sheet">
-      <div className="mini-chart" aria-label="模拟价格走势">
-        <div className="chart-grid" />
-        <svg viewBox="0 0 240 110" role="img"><polyline points={visible.map((value, index) => `${12 + index * 36},${98 - value}`).join(' ')} fill="none" stroke="#d99b27" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        <span>模拟标的 · 第 {round + 1} 回合</span><b>¥{visible.at(-1)}.00</b>
-      </div>
-      <div className="market-clue"><b>本回合线索</b><p>{round === 0 ? '价格连续震荡，但你还不知道自己的使用期限。' : round === 1 ? '短期上涨，波动也在加大。' : '市场回落，你的应急金仍不足三个月。'}</p></div>
-      <div className="decision-actions"><button onClick={() => decide('wait')}>再观察</button><button onClick={() => decide('buy')}>模拟买入</button></div>
-      {choice && <p className="decision-feedback">{choice === 'buy' ? '你选择了模拟买入。先写下买入理由，比猜涨跌更重要。' : '你选择了等待。等待也是一种有明确成本与理由的决策。'}</p>}
-      <small className="risk-note">这是手感练习，不做行情预测，不构成投资建议，也不连接真实资金。</small>
     </PaperSheet>
   )
 }

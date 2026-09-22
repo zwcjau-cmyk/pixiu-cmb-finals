@@ -1,0 +1,79 @@
+[
+  {
+    "id": "travel_plan_without_profile",
+    "prompt": "我国庆要去港澳玩，你帮我规划一下。",
+    "intent": "预算与目标规划",
+    "must_include": ["体验数据", "穷鬼版", "正常版", "奢侈版", "购物", "机动金"],
+    "must_not_include": ["无法规划", "没有记录所以"]
+  },
+  {
+    "id": "purchase_goal",
+    "prompt": "我想在三个月后买一台6000元的电脑，帮我做个攒钱计划。",
+    "intent": "预算与目标规划",
+    "must_include": ["体验数据", "缺口", "每月", "买完"],
+    "must_not_include": ["无法规划"]
+  },
+  {
+    "id": "liquid_assets_only",
+    "prompt": "我现在有多少钱可以直接拿出来用？定期和基金不要算进去。",
+    "intent": "资产与流动性",
+    "must_include": ["体验数据", "6150"],
+    "must_not_include": ["建议你买", "收益基本是零"]
+  },
+  {
+    "id": "expense_record_default_cash",
+    "prompt": "今天午饭花了20元。",
+    "intent": "记录一笔钱",
+    "must_include": ["20", "零钱"],
+    "must_not_include": ["从哪个账户"]
+  },
+  {
+    "id": "income_record_default_cash",
+    "prompt": "今天家教收入300元。",
+    "intent": "记录一笔钱",
+    "must_include": ["300", "零钱"],
+    "must_not_include": ["存到哪里", "定期", "理财", "怎么安排"]
+  },
+  {
+    "id": "expense_diagnosis_sparse_data",
+    "prompt": "最近钱都花哪儿了？顺便告诉我怎么省一点。",
+    "intent": "查账与消费复盘",
+    "must_include": ["数据", "建议"],
+    "must_not_include": ["无法分析"]
+  },
+  {
+    "id": "fund_explanation",
+    "prompt": "基金和银行定期有什么区别？",
+    "intent": "投资理财与金融知识",
+    "must_include": ["流动性", "风险"],
+    "must_not_include": ["保证收益", "稳赚机会"]
+  },
+  {
+    "id": "internal_transfer",
+    "prompt": "把零钱里的1000元转到定期存款。",
+    "intent": "转入转出与账户调整",
+    "must_include": ["1000", "期限"],
+    "must_not_include": ["转账完成", "已完成", "收入1000", "支出1000"]
+  },
+  {
+    "id": "page_navigation",
+    "prompt": "打开财富金库。",
+    "intent": "App功能与页面操作",
+    "must_include": ["财富金库"],
+    "must_not_include": ["投资建议", "消费分析"]
+  },
+  {
+    "id": "casual_chat",
+    "prompt": "今天好累。",
+    "intent": "闲聊",
+    "must_include": [],
+    "must_not_include": ["请上传账单", "建议投资", "开始记账", "花销", "消费", "奶茶", "外卖"]
+  },
+  {
+    "id": "large_income_steady_allocation",
+    "prompt": "今天收到5000元实习工资。",
+    "intent": "记录一笔钱",
+    "must_include": ["5000", "零钱", "参考比例", "定期"],
+    "must_not_include": ["股票", "行业基金", "杠杆", "虚拟货币"]
+  }
+]

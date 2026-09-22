@@ -22,7 +22,13 @@ class SpeechRecognizerTool(Toolkit):
             )
         return self._client
 
-    def transcribe_audio(self, audio_path: Optional[str] = None, audio_base64: Optional[str] = None) -> str:
+    def transcribe_audio(
+        self,
+        audio_path: Optional[str] = None,
+        audio_base64: Optional[str] = None,
+        filename: str = "audio.wav",
+        mime_type: str = "audio/wav",
+    ) -> str:
         """将语音文件转录为文本。
 
         Args:
@@ -48,7 +54,7 @@ class SpeechRecognizerTool(Toolkit):
             # 使用 OpenAI 兼容的 audio transcription 接口
             transcription = self.client.audio.transcriptions.create(
                 model=MODEL_ASR,
-                file=("audio.wav", audio_data, "audio/wav"),
+                file=(filename, audio_data, mime_type),
             )
 
             result = {

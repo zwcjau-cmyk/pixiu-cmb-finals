@@ -3,7 +3,9 @@
 基于 Agno 框架 + FastAPI 提供 HTTP 接口
 """
 import json
+import copy
 import os
+import re
 import uuid
 from pathlib import Path
 from typing import Optional
@@ -21,9 +23,10 @@ from agno.agent import Agent
 from agno.models.openai.like import OpenAILike
 from agno.db.sqlite import SqliteDb
 
-from config import ARK_API_KEY, ARK_BASE_URL, MODEL_CHARACTER
+from config import ARK_API_KEY, ARK_BASE_URL, MODEL_MAIN
 from tools.diary_ledger import DiaryToLedgerTool
 from tools.vault_manager import VaultManagerTool
+from tools.budget_calculator import BudgetCalculatorTool
 from tools.ui_control import UIControlTool
 from tools.image_generator import ImageGeneratorTool
 from tools.speech_recognizer import SpeechRecognizerTool
@@ -42,6 +45,29 @@ _date_template = "\n\n---\n## 系统信息\n- 今天的日期是：{today}\n- �
 _today = _dt.now(_CN_TZ).strftime("%Y-%m-%d")
 soul_prompt += _date_template.format(today=_today)
 
+
+def _request_policy(message: str) -> str:
+    """为高确定性意图追加本轮硬约束，减少模型在窄任务上的自由发挥。"""
+    text = message.strip()
+    amounts = [float(value) for value in re.findall(r"(?<!\d)(\d+(?:\.\d+)?)\s*(?:元|块|块钱)?", text)]
+    amount = max(amounts) if amounts else None
+    income_intent = any(word in text for word in ("收入", "工资", "到账", "收到", "赚了", "进账", "生活费", "奖学金", "红包"))
+    expense_intent = any(word in text for word in ("花了", "消费", "买了", "付款", "午饭", "晚饭", "早餐"))
+    finance_terms = ("钱", "收入", "支出", "工资", "预算", "记账", "基金", "理财", "存款", "零钱", "资产", "消费", "花了", "买了")
+    casual_emotion = any(word in text for word in ("好累", "累死", "烦死", "难过", "不开心", "开心死", "压力大", "想聊聊"))
+
+    if income_intent and amount is not None and amount < 3000:
+        return "\n\n## 本轮硬约束\n这是低于3000元的单笔收入。调用记账工具后只确认金额、类别和零钱变化；首次记账可加欢迎语。禁止追加任何储蓄、消费、定期、投资、奖励自己或资金安排建议，也不要追问。"
+    if income_intent and amount is not None and amount >= 3000:
+        return "\n\n## 本轮硬约束\n这是3000元及以上的大额收入。确认入账后可给简短稳健比例建议，只能涉及零钱、银行定期、货币基金、短债基金或低波动固收类产品，不得出现高风险产品。"
+    if expense_intent and amount is not None:
+        return "\n\n## 本轮硬约束\n这是单笔支出记账。调用工具后只确认金额、类别和零钱变化；首次记账可加欢迎语。禁止追加省钱教育、消费评价或追问。"
+    if casual_emotion and not any(term in text for term in finance_terms):
+        return "\n\n## 本轮硬约束\n这是普通情绪闲聊。只回应用户的情绪或当前话题，禁止提及钱、花钱、消费、记账、预算、投资或App功能，包括结尾和括号中的顺带提醒。"
+    if "转" in text and "定期" in text and not re.search(r"(?:3|6|12|三|六|十二)\s*个?月", text):
+        return "\n\n## 本轮硬约束\n用户未说明定期期限。不得执行转账或声称已完成；简要说明预计余额变化与总资产不变，然后询问期限。回复控制在250字以内。"
+    return ""
+
 # 数据库路径
 DB_PATH = Path(__file__).parent / "data" / "pixiu.db"
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -54,7 +80,7 @@ _vault_tool = VaultManagerTool()
 pixiu_agent = Agent(
     name="貔貅学长",
     model=OpenAILike(
-        id=MODEL_CHARACTER,
+        id=MODEL_MAIN,
         api_key=ARK_API_KEY,
         base_url=ARK_BASE_URL,
     ),
@@ -63,6 +89,7 @@ pixiu_agent = Agent(
     tools=[
         _diary_tool,
         _vault_tool,
+        BudgetCalculatorTool(),
         UIControlTool(),
         ImageGeneratorTool(),
         SpeechRecognizerTool(),
@@ -105,13 +132,31 @@ class ChatResponse(BaseModel):
     session_id: str
 
 
+class SpeechRecognitionRequest(BaseModel):
+    audio_base64: str
+    mime_type: str = "audio/webm"
+    filename: str = "recording.webm"
+
+
+@backend_app.post("/speech/transcribe")
+async def transcribe_speech(req: SpeechRecognitionRequest):
+    result = json.loads(SpeechRecognizerTool().transcribe_audio(
+        audio_base64=req.audio_base64,
+        filename=req.filename,
+        mime_type=req.mime_type,
+    ))
+    if not result.get("success"):
+        raise HTTPException(status_code=502, detail=result.get("message", "语音识别失败"))
+    return {"text": result["text"]}
+
+
 @backend_app.post("/chat")
 async def chat_endpoint(req: ChatRequest):
     """与貔貅学长对话 - SSE 流式输出"""
     # 每次请求动态更新日期，确保跨天后日期正确（东八区）
     today_str = _dt.now(_CN_TZ).strftime("%Y-%m-%d")
     base_prompt = SOUL_PATH.read_text(encoding="utf-8")
-    pixiu_agent.instructions = [base_prompt + _date_template.format(today=today_str)]
+    pixiu_agent.instructions = [base_prompt + _date_template.format(today=today_str) + _request_policy(req.message)]
 
     # 自动注入 user_id 到工具实例，不依赖 LLM 传参
     _diary_tool._current_user_id = req.user_id
@@ -243,7 +288,12 @@ VAULT_FILE = DATA_DIR / "vault.json"
 
 from data.mock_data import DEFAULT_EXPENSES as _DEFAULT_EXPENSES
 from data.mock_data import DEFAULT_VAULT as _DEFAULT_VAULT
-from tools.vault_manager import _get_user_vault_file, _load_vault as _load_user_vault, DEFAULT_VAULT as _VAULT_DEFAULT
+from tools.vault_manager import (
+    _get_user_vault_file,
+    _load_vault as _load_user_vault,
+    apply_ledger_cash_flow,
+    DEFAULT_VAULT as _VAULT_DEFAULT,
+)
 
 
 def _get_user_expenses_file(user_id: str) -> Path:
@@ -304,6 +354,9 @@ async def record_expense(req: ExpenseRecord):
 
     expenses_file = _get_user_expenses_file(req.user_id)
     data = _load_json(expenses_file)
+    if not data:
+        data = copy.deepcopy(_DEFAULT_EXPENSES)
+        data["is_demo_seeded"] = True
     if "records" not in data:
         data["records"] = []
     if "monthly_summary" not in data:
@@ -325,11 +378,15 @@ async def record_expense(req: ExpenseRecord):
         data["monthly_summary"]["total_income"] = data["monthly_summary"].get("total_income", 0) + req.amount
 
     _save_json(expenses_file, data)
+    vault_sync = apply_ledger_cash_flow(
+        req.user_id, req.amount, req.type, req.description, record["date"]
+    )
     return {
         "success": True,
         "record": record,
         "monthly_summary": data["monthly_summary"],
-        "message": f"已记录{'支出' if req.type == 'expense' else '收入'} ¥{req.amount}（{req.category}）"
+        "vault_sync": vault_sync,
+        "message": f"已记录{'支出' if req.type == 'expense' else '收入'} ¥{req.amount}（{req.category}）并同步零钱"
     }
 
 
@@ -340,7 +397,10 @@ async def import_expenses(req: ExpenseImportRequest):
         raise HTTPException(status_code=400, detail="单次请导入 1 到 1000 条记录")
 
     expenses_file = _get_user_expenses_file(req.user_id)
-    data = _load_json(expenses_file) or {"records": [], "monthly_summary": {}}
+    data = _load_json(expenses_file)
+    if not data:
+        data = copy.deepcopy(_DEFAULT_EXPENSES)
+        data["is_demo_seeded"] = True
     existing = data.setdefault("records", [])
     existing_keys = {
         (str(record.get("date")), str(record.get("type")), str(record.get("category")), float(record.get("amount", 0)), str(record.get("description", "")))
@@ -349,6 +409,7 @@ async def import_expenses(req: ExpenseImportRequest):
 
     imported = 0
     skipped = 0
+    imported_records = []
     now = _dt.now(_CN_TZ).isoformat()
     for item in req.records:
         try:
@@ -361,7 +422,7 @@ async def import_expenses(req: ExpenseImportRequest):
         if key in existing_keys:
             skipped += 1
             continue
-        existing.insert(0, {
+        imported_record = {
             "date": parsed_date,
             "type": item.type,
             "category": item.category.strip() or "其他",
@@ -369,7 +430,9 @@ async def import_expenses(req: ExpenseImportRequest):
             "description": item.description.strip(),
             "created_at": now,
             "source": "csv_import",
-        })
+        }
+        existing.insert(0, imported_record)
+        imported_records.append(imported_record)
         existing_keys.add(key)
         imported += 1
 
@@ -378,7 +441,15 @@ async def import_expenses(req: ExpenseImportRequest):
         "total_income": sum(record["amount"] for record in existing if record.get("type") == "income"),
     }
     _save_json(expenses_file, data)
-    return {"success": True, "imported_count": imported, "skipped_count": skipped}
+    for record in imported_records:
+        apply_ledger_cash_flow(
+            req.user_id,
+            record["amount"],
+            record["type"],
+            record["description"],
+            record["date"],
+        )
+    return {"success": True, "imported_count": imported, "skipped_count": skipped, "vault_synced": True}
 
 
 def _expense_records_for_user(user_id: Optional[str]) -> tuple[list[dict], bool]:
@@ -387,7 +458,7 @@ def _expense_records_for_user(user_id: Optional[str]) -> tuple[list[dict], bool]
         user_file = _get_user_expenses_file(user_id)
         user_data = _load_json(user_file)
         if user_data.get("records"):
-            return user_data["records"], False
+            return user_data["records"], bool(user_data.get("is_demo_seeded"))
     return _DEFAULT_EXPENSES.get("records", []), True
 
 
@@ -503,8 +574,8 @@ async def get_vault_status(user_id: Optional[str] = None):
     """获取金库完整状态（按 user_id 隔离）"""
     if user_id:
         vault_file = _get_user_vault_file(user_id)
-        is_demo = not vault_file.exists()
         data = _load_user_vault(user_id)
+        is_demo = bool(data.get("is_demo_seeded", not vault_file.exists()))
     else:
         vault_file = VAULT_FILE
         data = _load_json(VAULT_FILE)
@@ -516,7 +587,7 @@ async def get_vault_status(user_id: Optional[str] = None):
     result["monthly_net_flow"] = data.get("monthly_net_flow", data.get("monthly_growth", 0))
     result["data_updated_at"] = (
         _dt.fromtimestamp(vault_file.stat().st_mtime, _CN_TZ).strftime("%Y-%m-%d %H:%M")
-        if vault_file.exists() else "2026-05-18（体验数据）"
+        if vault_file.exists() else "2026-09-20（体验数据）"
     )
     return result
 
@@ -526,8 +597,8 @@ async def get_account_detail(account_id: str, user_id: Optional[str] = None):
     """获取某个账户的详细信息（按 user_id 隔离）"""
     if user_id:
         vault_file = _get_user_vault_file(user_id)
-        is_demo = not vault_file.exists()
         data = _load_user_vault(user_id)
+        is_demo = bool(data.get("is_demo_seeded", not vault_file.exists()))
     else:
         vault_file = VAULT_FILE
         data = _load_json(VAULT_FILE)
@@ -553,7 +624,7 @@ async def get_account_detail(account_id: str, user_id: Optional[str] = None):
         "is_demo": is_demo,
         "data_updated_at": (
             _dt.fromtimestamp(vault_file.stat().st_mtime, _CN_TZ).strftime("%Y-%m-%d %H:%M")
-            if vault_file.exists() else "2026-05-18（体验数据）"
+            if vault_file.exists() else "2026-09-20（体验数据）"
         ),
     }
 

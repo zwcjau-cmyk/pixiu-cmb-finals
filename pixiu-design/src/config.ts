@@ -7,9 +7,9 @@ declare global {
 const isLocalDevelopment = ['localhost', '127.0.0.1'].includes(globalThis.location?.hostname)
 const runtimeApiBase = globalThis.__PIXIU_API_BASE__?.trim()
 
-export const API_BASE = runtimeApiBase || (isLocalDevelopment
-  ? 'http://localhost:8000'
-  : 'https://pixiu-cmb-finals.edgeone.dev')
+export const API_BASE = isLocalDevelopment
+  ? 'http://127.0.0.1:8001'
+  : runtimeApiBase || 'https://pixiu-cmb-finals.edgeone.dev'
 
 // 获取或生成用户唯一标识（持久化到 localStorage，每个浏览器唯一）
 export function getUserId(): string {

@@ -138,12 +138,12 @@ export default function AccountDetail({ accountId, onBack, onWithdraw }: Props) 
             </div>
             <div className="flex items-center gap-2 mt-0.5">
               <p className="text-xl font-bold text-on-surface">¥{data.balance.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</p>
-              <div className="flex items-center gap-1 px-2 py-0.5 bg-secondary-container/60 rounded-full">
+              {accountId !== 'active_pool' && <div className="flex items-center gap-1 px-2 py-0.5 bg-secondary-container/60 rounded-full">
                 <TrendingUp size={12} className="text-secondary" />
                 <span className="text-xs text-secondary font-medium">本月收益 {data.monthly_profit >= 0 ? '+' : ''}¥{data.monthly_profit}</span>
-              </div>
+              </div>}
             </div>
-            <p className="mt-1 text-xs text-on-surface-variant/80">收益为体验口径，不含转入转出；以页面更新时间为准。</p>
+            <p className="mt-1 text-xs text-on-surface-variant/80">{accountId === 'active_pool' ? '默认收入和日常支出会同步更新此余额。' : '收益为体验口径，不含转入转出；以页面更新时间为准。'}</p>
             {data.data_updated_at && <p className="mt-0.5 text-xs text-on-surface-variant/70">数据更新：{data.data_updated_at}</p>}
           </div>
           <img src="/images/2D卡通资金池设计 (2).png" alt="资金池" className="w-20 h-20 object-contain" />
@@ -152,17 +152,17 @@ export default function AccountDetail({ accountId, onBack, onWithdraw }: Props) 
         {/* 本金与收益摘要 */}
         <div className="flex items-center gap-3 mt-3 px-3 py-2.5 bg-surface-container-low rounded-xl">
           <div className="flex-1 text-center">
-            <p className="text-xs text-on-surface-variant">本金</p>
+            <p className="text-xs text-on-surface-variant">{accountId === 'active_pool' ? '可用余额' : '本金'}</p>
             <p className="text-sm font-bold text-on-surface">¥{data.principal.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</p>
           </div>
           <div className="w-px h-8 bg-outline-variant/30" />
           <div className="flex-1 text-center">
-            <p className="text-xs text-on-surface-variant">累计收益</p>
-            <p className="text-sm font-bold text-secondary">+¥{(data.balance - data.principal).toFixed(2)}</p>
+            <p className="text-xs text-on-surface-variant">{accountId === 'active_pool' ? '账户数量' : '累计收益'}</p>
+            <p className="text-sm font-bold text-secondary">{accountId === 'active_pool' ? `${data.products.length} 个` : `+¥${(data.balance - data.principal).toFixed(2)}`}</p>
           </div>
           <div className="w-px h-8 bg-outline-variant/30" />
           <div className="flex-1 text-center">
-            <p className="text-xs text-on-surface-variant">{accountId === 'fund_collection' ? '近一月涨跌' : '参考年化'}</p>
+            <p className="text-xs text-on-surface-variant">{accountId === 'active_pool' ? '资金属性' : accountId === 'fund_collection' ? '近一月涨跌' : '参考年化'}</p>
             <p className="text-sm font-bold text-primary">{data.rate}</p>
           </div>
         </div>
@@ -170,14 +170,14 @@ export default function AccountDetail({ accountId, onBack, onWithdraw }: Props) 
 
       {/* 产品明细 */}
       <div className="px-4 pb-3">
-        <h3 className="text-sm font-bold text-on-surface mb-2">📋 产品明细</h3>
+        <h3 className="text-sm font-bold text-on-surface mb-2">📋 {accountId === 'active_pool' ? '资金账户' : '产品明细'}</h3>
         <div className="space-y-2">
           {data.products.map((product, idx) => (
             <div key={idx} className="flex items-center justify-between px-3 py-2.5 bg-white rounded-xl border border-outline-variant/15 shadow-sm">
               <div>
                 <p className="text-[12px] font-medium text-on-surface">{product.name}</p>
                 <p className="mt-0.5 text-xs text-on-surface-variant">
-                  买入：{product.buy_date.replace(/-/g, '/')}
+                  {accountId === 'active_pool' ? '更新' : accountId === 'fixed_deposit' ? '存入' : '买入'}：{product.buy_date.replace(/-/g, '/')}
                   {product.maturity_date && ` · 到期：${product.maturity_date.replace(/-/g, '/')}`}
                   {product.code && ` · ${product.code}`}
                 </p>

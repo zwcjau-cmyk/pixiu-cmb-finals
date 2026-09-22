@@ -19,6 +19,7 @@ Optional environment variables already have defaults in `config.py`:
 
 ```text
 ARK_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+ARK_MODEL_MAIN=deepseek-v4-1-flash-260910
 ARK_MODEL_CHARACTER=doubao-seed-character-251128
 ARK_MODEL_PRO=doubao-seed-2-0-pro-260215
 ARK_MODEL_VISION=doubao-seed-2-0-pro-260215

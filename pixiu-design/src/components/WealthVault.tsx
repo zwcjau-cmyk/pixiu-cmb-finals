@@ -71,7 +71,7 @@ export default function WealthVault({ isActive, onSwitchToAgent }: { isActive?: 
           icon: Droplets,
           title: vaultData.accounts.active_pool.label,
           amount: `¥${vaultData.accounts.active_pool.balance.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}`,
-          subtitle: `参考年化 ${vaultData.accounts.active_pool.rate} · 灵活取用`,
+          subtitle: '银行卡、支付宝与微信中的可用余额',
           color: 'from-[#87CEEB]/20 to-[#B0E0E6]/10',
           iconColor: 'text-[#4A90D9]',
           borderColor: 'border-[#87CEEB]/30',
@@ -80,7 +80,7 @@ export default function WealthVault({ isActive, onSwitchToAgent }: { isActive?: 
           icon: Lock,
           title: vaultData.accounts.fixed_deposit.label,
           amount: `¥${vaultData.accounts.fixed_deposit.balance.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}`,
-          subtitle: `${vaultData.accounts.fixed_deposit.term} · 参考年化 ${vaultData.accounts.fixed_deposit.rate}`,
+          subtitle: `银行定期存款 · ${vaultData.accounts.fixed_deposit.term}`,
           color: 'from-amber-warm/10 to-gold/5',
           iconColor: 'text-amber-warm',
           borderColor: 'border-amber-warm/20',
@@ -89,7 +89,7 @@ export default function WealthVault({ isActive, onSwitchToAgent }: { isActive?: 
           icon: BookOpen,
           title: vaultData.accounts.fund_collection.label,
           amount: `¥${vaultData.accounts.fund_collection.balance.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}`,
-          subtitle: `近一月涨跌 ${vaultData.accounts.fund_collection.rate} · 净值波动`,
+          subtitle: `基金产品 · 近一月涨跌 ${vaultData.accounts.fund_collection.rate}`,
           color: 'from-sage/15 to-secondary/5',
           iconColor: 'text-sage',
           borderColor: 'border-sage/30',
@@ -134,7 +134,7 @@ export default function WealthVault({ isActive, onSwitchToAgent }: { isActive?: 
               <span className="text-xs text-secondary font-medium">{monthlyGrowth}</span>
             </div>
           </div>
-          <p className="mt-1 text-xs leading-relaxed text-on-surface-variant/80">资产变动包含转入、转出与收益，不等同于投资收益。</p>
+          <p className="mt-1 text-xs leading-relaxed text-on-surface-variant/80">日常收支默认同步到零钱；定期存款和投资理财单独管理。</p>
           {vaultData.data_updated_at && <p className="mt-0.5 text-xs text-on-surface-variant/70">数据更新：{vaultData.data_updated_at}</p>}
         </div>
         <img src="/images/2D卡通资金池设计 (2).png" alt="资金池" className="w-16 h-16 object-contain" />

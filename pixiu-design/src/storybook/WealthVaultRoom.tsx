@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { ArrowRight, BookOpenCheck, ChevronRight, Droplets, Eye, EyeOff, Landmark, Send, Settings, Telescope, TrendingUp, Vault } from 'lucide-react'
 import { API_BASE, getUserId } from '../config'
-import { MarketForecastLab, PaperSheet, SettingsSheet, TradePracticeLab } from './StorybookPanels'
+import { MarketForecastLab, PaperSheet, SettingsSheet } from './StorybookPanels'
+import { TradePracticeLab } from './TradePracticeLab'
 
 interface VaultData {
   total_assets: number
@@ -18,9 +19,9 @@ const fallback: VaultData = {
   monthly_net_flow: 856,
   is_demo: true,
   accounts: {
-    active_pool: { label: '活期池', balance: 3256, rate: '+56.00' },
-    fixed_deposit: { label: '定期舱', balance: 6000, rate: '+300.00', term: '3个月' },
-    fund_collection: { label: '基金图鉴', balance: 3600, rate: '-500.00' },
+    active_pool: { label: '零钱', balance: 6150, rate: '+600.00' },
+    fixed_deposit: { label: '定期存款', balance: 2500, rate: '+2.50', term: '3–6个月' },
+    fund_collection: { label: '投资理财', balance: 1500, rate: '+18.00' },
   },
   goals: [{ name: '新款笔记本电脑', target: 5999, current: 3999, emoji: '💻' }],
 }
