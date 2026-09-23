@@ -38,7 +38,7 @@ https://<project-domain>/api/health
 Expected response:
 
 ```json
-{"status":"ok","agent":"貔貅学长"}
+{"status":"ok","agent":"貔貅学长","release":"2026-09-23-asr-split-v1"}
 ```
 
 ## Current persistence limitation

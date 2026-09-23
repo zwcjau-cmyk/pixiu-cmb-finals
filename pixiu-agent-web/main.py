@@ -188,7 +188,7 @@ async def chat_endpoint(req: ChatRequest):
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "agent": "貔貅学长"}
+    return {"status": "ok", "agent": "貔貅学长", "release": "2026-09-23-asr-split-v1"}
 
 
 # ============ 贴纸制作 Agent API ============
