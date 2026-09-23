@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, Check, ChevronRight, FileSpreadsheet, LoaderCircle, Mic, Send, ShieldCheck, Square, X } from 'lucide-react'
 import { API_BASE, getUserId } from '../config'
+import { encodeWavPcm16 } from './audioPcm'
 
 export function PaperSheet({ title, subtitle, children, onClose, className = '' }: {
   title: string
@@ -166,17 +167,28 @@ export function RoomChatOverlay({ initialMessages, onClose }: { initialMessages:
     setVoiceState('recognizing')
     setVoiceHint('正在把语音变成文字…')
     try {
+      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      const audioContext = new AudioContextClass()
+      const decoded = await audioContext.decodeAudioData(await blob.arrayBuffer())
+      const mono = new Float32Array(decoded.length)
+      for (let channel = 0; channel < decoded.numberOfChannels; channel += 1) {
+        const channelData = decoded.getChannelData(channel)
+        for (let index = 0; index < mono.length; index += 1) mono[index] += channelData[index] / decoded.numberOfChannels
+      }
+      const wavBytes = encodeWavPcm16(mono, decoded.sampleRate)
+      const wavBuffer = wavBytes.buffer.slice(wavBytes.byteOffset, wavBytes.byteOffset + wavBytes.byteLength) as ArrayBuffer
+      const wavBlob = new Blob([wavBuffer], { type: 'audio/wav' })
+      await audioContext.close()
       const audioBase64 = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader()
         reader.onload = () => resolve(String(reader.result).split(',')[1] || '')
         reader.onerror = () => reject(reader.error)
-        reader.readAsDataURL(blob)
+        reader.readAsDataURL(wavBlob)
       })
-      const extension = blob.type.includes('mp4') ? 'm4a' : blob.type.includes('ogg') ? 'ogg' : 'webm'
       const response = await fetch(`${API_BASE}/api/speech/transcribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ audio_base64: audioBase64, mime_type: blob.type, filename: `recording.${extension}` }),
+        body: JSON.stringify({ audio_base64: audioBase64, mime_type: 'audio/wav', filename: 'recording.wav' }),
       })
       if (!response.ok) throw new Error('识别失败')
       const data = await response.json() as { text?: string }

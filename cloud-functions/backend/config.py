@@ -14,7 +14,13 @@ MODEL_PRO = os.getenv("ARK_MODEL_PRO", "doubao-seed-2-0-pro-260215")
 MODEL_CHARACTER = os.getenv("ARK_MODEL_CHARACTER", "doubao-seed-character-251128")
 MODEL_VISION = os.getenv("ARK_MODEL_VISION", "doubao-seed-2-0-pro-260215")
 MODEL_SEEDREAM = os.getenv("ARK_MODEL_SEEDREAM", "doubao-seedream-4-5-251128")
-MODEL_ASR = os.getenv("ARK_MODEL_ASR", "doubao-seed-asr-1-0")
+# 豆包语音 ASR 使用独立于方舟的语音服务 API Key。
+VOLC_ASR_API_KEY = os.getenv("VOLC_ASR_API_KEY", "")
+VOLC_ASR_RESOURCE_ID = os.getenv("VOLC_ASR_RESOURCE_ID", "volc.bigasr.auc_turbo")
+VOLC_ASR_ENDPOINT = os.getenv(
+    "VOLC_ASR_ENDPOINT",
+    "https://openspeech.bytedance.com/api/v3/auc/bigmodel/recognize/flash",
+)
 
 # 校验 ARK_API_KEY 是否已配置
 if not ARK_API_KEY:

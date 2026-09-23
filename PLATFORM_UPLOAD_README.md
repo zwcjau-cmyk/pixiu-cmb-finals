@@ -11,6 +11,6 @@
 
 ## 上线前必须配置
 
-在后端平台的密钥设置中填写 `ARK_API_KEY`。不要把真实值写入任何代码文件。
+在后端平台的密钥设置中填写 `ARK_API_KEY` 和 `VOLC_ASR_API_KEY`。后者来自豆包语音控制台，不是方舟 Key。不要把真实值写入任何代码文件。
 
 前端不需要 API Key。前端通过 `pixiu-design/public/pixiu-env.js` 指向后端公开地址。

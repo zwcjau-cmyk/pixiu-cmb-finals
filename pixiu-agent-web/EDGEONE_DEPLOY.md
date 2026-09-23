@@ -13,6 +13,7 @@ Required secret:
 
 ```text
 ARK_API_KEY=<Volcengine Ark API key>
+VOLC_ASR_API_KEY=<Doubao Speech ASR API key>
 ```
 
 Optional environment variables already have defaults in `config.py`:
@@ -24,7 +25,8 @@ ARK_MODEL_CHARACTER=doubao-seed-character-251128
 ARK_MODEL_PRO=doubao-seed-2-0-pro-260215
 ARK_MODEL_VISION=doubao-seed-2-0-pro-260215
 ARK_MODEL_SEEDREAM=doubao-seedream-4-5-251128
-ARK_MODEL_ASR=doubao-seed-asr-1-0
+VOLC_ASR_RESOURCE_ID=volc.bigasr.auc_turbo
+VOLC_ASR_ENDPOINT=https://openspeech.bytedance.com/api/v3/auc/bigmodel/recognize/flash
 ```
 
 After deployment, verify:
